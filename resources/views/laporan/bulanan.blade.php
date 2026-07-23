@@ -49,7 +49,7 @@
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
         <div class="px-5 py-4 border-b bg-blue-50">
             <h3 class="text-sm font-semibold text-blue-800">
-                Laporan Stok — {{ \Carbon\Carbon::create()->month(request('bulan', now()->month))->isoFormat('MMMM') }} {{ request('tahun', now()->year) }}
+                Laporan Stok — {{ \Carbon\Carbon::create()->month((int) request('bulan', now()->month))->isoFormat('MMMM') }} {{ request('tahun', now()->year) }}
             </h3>
             <p class="text-xs text-blue-500 mt-0.5">{{ pengaturan()->nama_instansi }}</p>
         </div>
@@ -69,7 +69,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-                @php $no = 1; $bulan = request('bulan', now()->month); $tahun = request('tahun', now()->year); @endphp
+                @php $no = 1; $bulan = (int) request('bulan', now()->month); $tahun = (int) request('tahun', now()->year); @endphp
                 @foreach($barangs as $b)
                     @php
                         $sa = $b->getStokAwal($bulan, $tahun);
