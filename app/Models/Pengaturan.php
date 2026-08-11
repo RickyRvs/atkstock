@@ -10,6 +10,7 @@ class Pengaturan extends Model
     protected $table = 'pengaturans';
 
     protected $fillable = [
+        'instansi_id',
         'nama_sistem',
         'nama_instansi',
         'alamat_instansi',
@@ -26,20 +27,33 @@ class Pengaturan extends Model
         'ttd3_nip',
     ];
 
+    /**
+     * Ambil pengaturan milik instansi yang sedang aktif di session.
+     * Kalau belum ada row untuk instansi itu, otomatis dibuatkan default.
+     */
     public static function current(): self
     {
-        return Cache::rememberForever('pengaturan_sistem', function () {
-            return self::first() ?? self::create([
+        $instansiId = session('instansi_aktif_id');
+
+        return Cache::rememberForever(self::cacheKey($instansiId), function () use ($instansiId) {
+            return self::where('instansi_id', $instansiId)->first() ?? self::create([
+                'instansi_id'   => $instansiId,
                 'nama_sistem'   => 'Sistem Stok ATK/ARK',
-                'nama_instansi' => 'BPS Provinsi Riau',
+                'nama_instansi' => optional(Instansi::find($instansiId))->nama ?? 'BPS Provinsi Riau',
                 'kota'          => 'Pekanbaru',
             ]);
         });
     }
 
-    public static function clearCache(): void
+    public static function clearCache(?int $instansiId = null): void
     {
-        Cache::forget('pengaturan_sistem');
+        $instansiId = $instansiId ?? session('instansi_aktif_id');
+        Cache::forget(self::cacheKey($instansiId));
+    }
+
+    protected static function cacheKey(?int $instansiId): string
+    {
+        return "pengaturan_sistem_{$instansiId}";
     }
 
     public function getLogoUrlAttribute(): ?string

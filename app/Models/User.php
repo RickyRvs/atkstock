@@ -81,4 +81,16 @@ class User extends Authenticatable
     {
         return $this->role === 'petugas';
     }
+
+ public function instansiAksesibel()
+{
+    return $this->belongsToMany(Instansi::class, 'instansi_user')
+        ->withPivot('is_home')
+        ->orderBy('nama');
+}
+
+public function instansiHome()
+{
+    return $this->instansiAksesibel()->wherePivot('is_home', true)->first();
+}
 }

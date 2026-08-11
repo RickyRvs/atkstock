@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Barang;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class BarangController extends Controller
 {
@@ -39,8 +40,13 @@ class BarangController extends Controller
 
     public function store(Request $request)
     {
+        $instansiId = session('instansi_aktif_id');
+
         $request->validate([
-            'kode_barang'  => 'required|string|max:20|unique:barangs,kode_barang',
+            'kode_barang' => [
+                'required', 'string', 'max:20',
+                Rule::unique('barangs', 'kode_barang')->where(fn ($q) => $q->where('instansi_id', $instansiId)),
+            ],
             'nama_barang'  => 'required|string|max:255',
             'satuan'       => 'required|string|max:30',
             'kategori_id'  => 'required|exists:kategoris,id',
@@ -62,10 +68,10 @@ class BarangController extends Controller
 
         $barang->load('kategori');
 
-        $stokAwal   = $barang->getStokAwal($bulan, $tahun);
-        $totalMasuk = $barang->getTotalMasuk($bulan, $tahun);
+        $stokAwal    = $barang->getStokAwal($bulan, $tahun);
+        $totalMasuk  = $barang->getTotalMasuk($bulan, $tahun);
         $totalKeluar = $barang->getTotalKeluar($bulan, $tahun);
-        $stokAkhir  = $barang->getStokAkhir($bulan, $tahun);
+        $stokAkhir   = $barang->getStokAkhir($bulan, $tahun);
 
         $transaksis = $barang->transaksis()
             ->byBulanTahun($bulan, $tahun)
@@ -88,8 +94,15 @@ class BarangController extends Controller
 
     public function update(Request $request, Barang $barang)
     {
+        $instansiId = session('instansi_aktif_id');
+
         $request->validate([
-            'kode_barang'  => 'required|string|max:20|unique:barangs,kode_barang,' . $barang->id,
+            'kode_barang' => [
+                'required', 'string', 'max:20',
+                Rule::unique('barangs', 'kode_barang')
+                    ->where(fn ($q) => $q->where('instansi_id', $instansiId))
+                    ->ignore($barang->id),
+            ],
             'nama_barang'  => 'required|string|max:255',
             'satuan'       => 'required|string|max:30',
             'kategori_id'  => 'required|exists:kategoris,id',

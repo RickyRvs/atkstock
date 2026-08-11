@@ -10,6 +10,8 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StokAwalController;
 use App\Http\Controllers\PengaturanController;
+use App\Http\Controllers\InstansiSwitchController;
+use App\Http\Controllers\AccountSwitchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,7 +38,12 @@ Route::middleware('auth')->group(function () {
     // Dashboard
     // ----------------------------------------------------------
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-
+Route::post('/switch-instansi', [InstansiSwitchController::class, 'switch'])->name('instansi.switch');
+Route::prefix('account-switch')->name('account-switch.')->group(function () {
+        Route::post('/', [AccountSwitchController::class, 'store'])->name('store');
+        Route::post('/{user}/pindah', [AccountSwitchController::class, 'switch'])->name('switch');
+        Route::delete('/{user}', [AccountSwitchController::class, 'destroy'])->name('destroy');
+    });
     // ----------------------------------------------------------
     // Master Barang
     // ----------------------------------------------------------

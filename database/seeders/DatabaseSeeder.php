@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
         );
 
         $this->call([
+            InstansiSeeder::class,
             KategoriSeeder::class,
             BarangSeeder::class,
             StokAwalSeeder::class,

@@ -245,6 +245,139 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
+
+                {{-- ================================================== --}}
+                {{-- DROPDOWN SWITCH AKUN --}}
+                {{-- ================================================== --}}
+                @php
+                    $linkedAccounts = \App\Models\AccountSwitchLink::with('user')
+                        ->where('device_token', request()->cookie('device_token'))
+                        ->whereHas('user', fn ($q) => $q->where('is_active', true))
+                        ->get()
+                        ->unique('user_id');
+                @endphp
+
+                <div x-data="{ openAcc: false, showAdd: false }" class="relative">
+                    <button @click="openAcc = !openAcc"
+                            class="flex items-center gap-2 text-sm border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-5.13a4 4 0 11-4-4 4 4 0 014 4zm6 0a4 4 0 11-4-4"/>
+                        </svg>
+                        <span class="font-medium text-gray-700 max-w-[100px] truncate">{{ auth()->user()->name }}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <div x-show="openAcc" @click.away="openAcc = false" x-cloak
+                         class="absolute right-0 mt-2 bg-white shadow-lg border border-gray-100 rounded-xl w-72 py-1.5 z-50">
+                        <p class="px-3 py-1.5 text-xs text-gray-400 uppercase tracking-wide font-medium">Akun Tersimpan</p>
+
+                        @foreach($linkedAccounts as $link)
+                            <div class="flex items-center justify-between px-3 py-2 hover:bg-gray-50 group">
+                                <form method="POST" action="{{ route('account-switch.switch', $link->user_id) }}" class="flex-1 min-w-0">
+                                    @csrf
+                                    <button type="submit" class="text-left w-full {{ $link->user_id === auth()->id() ? 'text-blue-600 font-semibold' : 'text-gray-700' }}">
+                                        <span class="text-sm block truncate">{{ $link->user->name }}</span>
+                                        <span class="text-xs text-gray-400 block truncate">{{ $link->user->email }}</span>
+                                    </button>
+                                </form>
+
+                                <div class="flex items-center gap-1 flex-shrink-0">
+                                    @if($link->user_id === auth()->id())
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                    @endif
+                                    <form method="POST" action="{{ route('account-switch.destroy', $link->user_id) }}"
+                                          onsubmit="return confirm('Lepas akun {{ $link->user->name }} dari daftar ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" title="Lepas akun" class="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endforeach
+
+                        <hr class="my-1">
+                        <button @click="showAdd = true; openAcc = false"
+                                class="w-full text-left px-3 py-2 text-sm text-blue-600 hover:bg-gray-50 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Tambah Akun Lain
+                        </button>
+                    </div>
+
+                    {{-- Modal tambah akun --}}
+                    <div x-show="showAdd" x-cloak
+                         class="fixed inset-0 bg-black/30 flex items-center justify-center z-50" style="display: none;">
+                        <div @click.away="showAdd = false" class="bg-white rounded-xl p-5 w-80 space-y-3 shadow-xl">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-semibold text-gray-800">Tambah Akun</h3>
+                                <button @click="showAdd = false" class="text-gray-400 hover:text-gray-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <form method="POST" action="{{ route('account-switch.store') }}" class="space-y-2">
+                                @csrf
+                                <input type="email" name="email" placeholder="Email" required
+                                       class="w-full rounded-lg border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500">
+                                <input type="password" name="password" placeholder="Password" required
+                                       class="w-full rounded-lg border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500">
+                                @error('email')
+                                    <p class="text-xs text-red-600">{{ $message }}</p>
+                                @enderror
+                                <button type="submit"
+                                        class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 rounded-lg font-medium transition-colors">
+                                    Masuk & Tambah
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- ================================================== --}}
+                {{-- DROPDOWN SWITCH INSTANSI (sudah ada sebelumnya) --}}
+                {{-- ================================================== --}}
+                @if(auth()->user()->instansiAksesibel->count() > 1)
+                    <div x-data="{ open: false }" class="relative">
+                        <button @click="open = !open"
+                                class="flex items-center gap-2 text-sm border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2M5 21h2m0 0h10M9 7h1m0 4h1m4-4h1m-1 4h1M9 21v-4a1 1 0 011-1h4a1 1 0 011 1v4"/>
+                            </svg>
+                            <span class="font-medium text-gray-700">{{ instansiAktif()?->nama ?? 'Pilih Instansi' }}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        <div x-show="open" @click.away="open = false" x-cloak
+                             class="absolute right-0 mt-2 bg-white shadow-lg border border-gray-100 rounded-xl w-64 py-1.5 z-50">
+                            <p class="px-3 py-1.5 text-xs text-gray-400 uppercase tracking-wide font-medium">Pilih Instansi</p>
+                            @foreach(auth()->user()->instansiAksesibel as $ins)
+                                <form method="POST" action="{{ route('instansi.switch') }}">
+                                    @csrf
+                                    <input type="hidden" name="instansi_id" value="{{ $ins->id }}">
+                                    <button type="submit"
+                                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center justify-between
+                                                   {{ $ins->id == session('instansi_aktif_id') ? 'text-blue-600 font-semibold bg-blue-50' : 'text-gray-700' }}">
+                                        {{ $ins->nama }}
+                                        @if($ins->id == session('instansi_aktif_id'))
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                        @endif
+                                    </button>
+                                </form>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
                 <span class="text-xs text-gray-400">{{ now()->isoFormat('D MMM Y') }}</span>
             </div>
         </header>

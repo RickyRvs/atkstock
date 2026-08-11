@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -20,6 +21,7 @@ class Barang extends Model
         'kategori_id',
         'keterangan',
         'is_active',
+        'instansi_id',
     ];
 
     protected function casts(): array
@@ -29,9 +31,29 @@ class Barang extends Model
         ];
     }
 
+    protected static function booted()
+    {
+        static::addGlobalScope('instansi', function (Builder $builder) {
+            if ($id = session('instansi_aktif_id')) {
+                $builder->where('barangs.instansi_id', $id);
+            }
+        });
+
+        static::creating(function ($model) {
+            if (empty($model->instansi_id)) {
+                $model->instansi_id = session('instansi_aktif_id');
+            }
+        });
+    }
+
     // =========================================================================
     // RELASI
     // =========================================================================
+
+    public function instansi(): BelongsTo
+    {
+        return $this->belongsTo(Instansi::class, 'instansi_id');
+    }
 
     /**
      * Barang ini milik satu kategori.
@@ -77,10 +99,6 @@ class Barang extends Model
     // HELPER / BUSINESS LOGIC
     // =========================================================================
 
-    /**
-     * Ambil stok awal bulan & tahun tertentu.
-     * Return 0 jika belum diinput.
-     */
     public function getStokAwal(int $bulan, int $tahun): int
     {
         $stok = $this->stokAwals()
@@ -91,9 +109,6 @@ class Barang extends Model
         return $stok ? $stok->jumlah : 0;
     }
 
-    /**
-     * Hitung total masuk bulan & tahun tertentu.
-     */
     public function getTotalMasuk(int $bulan, int $tahun): int
     {
         return $this->transaksiMasuk()
@@ -102,9 +117,6 @@ class Barang extends Model
             ->sum('jumlah');
     }
 
-    /**
-     * Hitung total keluar bulan & tahun tertentu.
-     */
     public function getTotalKeluar(int $bulan, int $tahun): int
     {
         return $this->transaksiKeluar()
@@ -114,8 +126,6 @@ class Barang extends Model
     }
 
     /**
-     * Hitung stok akhir bulan & tahun tertentu.
-     *
      * Rumus: Stok Akhir = Stok Awal + Total Masuk - Total Keluar
      */
     public function getStokAkhir(int $bulan, int $tahun): int
@@ -127,25 +137,16 @@ class Barang extends Model
         return $stokAwal + $totalMasuk - $totalKeluar;
     }
 
-    /**
-     * Ambil stok saat ini (bulan & tahun sekarang).
-     */
     public function getStokSekarang(): int
     {
         return $this->getStokAkhir(now()->month, now()->year);
     }
 
-    /**
-     * Scope: hanya barang aktif.
-     */
     public function scopeAktif($query)
     {
         return $query->where('is_active', true);
     }
 
-    /**
-     * Scope: filter berdasarkan kategori.
-     */
     public function scopeByKategori($query, int $kategoriId)
     {
         return $query->where('kategori_id', $kategoriId);

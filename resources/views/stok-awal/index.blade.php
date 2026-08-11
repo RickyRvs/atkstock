@@ -10,8 +10,11 @@
             <p class="text-sm text-gray-500">Stok awal per barang per bulan sebagai dasar perhitungan</p>
         </div>
         <a href="{{ route('stok-awal.create') }}"
-           class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
-            + Input Stok Awal
+           class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            Input Stok Awal
         </a>
     </div>
 
@@ -45,7 +48,10 @@
                 @endforeach
             </select>
         </div>
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition-colors">
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
             Tampilkan
         </button>
         @if($search)
@@ -67,7 +73,9 @@
 
         @if($barangs->isEmpty())
             <div class="px-5 py-14 text-center">
-                <p class="text-2xl mb-1">🔍</p>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"/>
+                </svg>
                 <p class="text-sm text-gray-400">
                     @if($search)
                         Tidak ada barang yang cocok dengan pencarian "{{ $search }}"
@@ -108,24 +116,30 @@
                                         <span class="text-orange-400 text-xs italic">belum diinput</span>
                                     @endif
                                 </td>
-                                <td class="px-5 py-3 text-center">
+                                <td class="px-5 py-3">
                                     @php
                                         $stokAwalId = \App\Models\StokAwal::where('barang_id', $b->id)
                                             ->where('bulan', $bulan)->where('tahun', $tahun)->value('id');
                                     @endphp
-                                    @if($stokAwalId)
-                                        <a href="{{ route('stok-awal.edit', $stokAwalId) }}"
-                                           class="inline-flex items-center gap-1 text-yellow-600 hover:text-yellow-800 text-xs font-medium">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                            Edit
-                                        </a>
-                                    @else
-                                        <a href="{{ route('stok-awal.create') }}?barang_id={{ $b->id }}&bulan={{ $bulan }}&tahun={{ $tahun }}"
-                                           class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs font-medium">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                                            Input
-                                        </a>
-                                    @endif
+                                    <div class="flex items-center justify-center">
+                                        @if($stokAwalId)
+                                            <a href="{{ route('stok-awal.edit', $stokAwalId) }}"
+                                               title="Edit"
+                                               class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 transition-colors">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                </svg>
+                                            </a>
+                                        @else
+                                            <a href="{{ route('stok-awal.create') }}?barang_id={{ $b->id }}&bulan={{ $bulan }}&tahun={{ $tahun }}"
+                                               title="Input"
+                                               class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                                </svg>
+                                            </a>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

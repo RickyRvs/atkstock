@@ -8,7 +8,7 @@
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-xl font-semibold text-gray-800">
-                Halo, {{ explode(' ', auth()->user()->name)[0] }} 👋
+                Halo, {{ explode(' ', auth()->user()->name)[0] }}
             </h2>
             <p class="text-sm text-gray-500">
                 Ringkasan persediaan {{ \Carbon\Carbon::create()->month($bulan)->isoFormat('MMMM') }} {{ $tahun }}
@@ -16,12 +16,18 @@
         </div>
         <div class="flex gap-2">
             <a href="{{ route('transaksi.masuk.create') }}"
-               class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
-                + Barang Masuk
+               class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/>
+                </svg>
+                Barang Masuk
             </a>
             <a href="{{ route('transaksi.keluar.create') }}"
-               class="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
-                + Barang Keluar
+               class="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/>
+                </svg>
+                Barang Keluar
             </a>
         </div>
     </div>
@@ -139,7 +145,9 @@
             </div>
             @if($barangHampirHabis->isEmpty())
                 <div class="px-5 py-10 text-center">
-                    <p class="text-2xl mb-1">✅</p>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-green-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
                     <p class="text-sm text-gray-400">Semua stok mencukupi</p>
                 </div>
             @else
@@ -223,33 +231,6 @@
             </div>
         </div>
     @endif
-
-    {{-- Quick Actions --}}
-    <div class="bg-white rounded-2xl shadow-sm p-5">
-        <h2 class="font-semibold text-gray-700 mb-4">Aksi Cepat</h2>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <a href="{{ route('transaksi.masuk.create') }}"
-               class="flex flex-col items-center gap-2 bg-green-50 hover:bg-green-100 text-green-700 text-sm px-4 py-4 rounded-xl font-medium transition-colors text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
-                Barang Masuk
-            </a>
-            <a href="{{ route('transaksi.keluar.create') }}"
-               class="flex flex-col items-center gap-2 bg-red-50 hover:bg-red-100 text-red-700 text-sm px-4 py-4 rounded-xl font-medium transition-colors text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
-                Barang Keluar
-            </a>
-            <a href="{{ route('laporan.bulanan') }}"
-               class="flex flex-col items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm px-4 py-4 rounded-xl font-medium transition-colors text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                Laporan Bulanan
-            </a>
-            <a href="{{ route('laporan.kartu-persediaan') }}"
-               class="flex flex-col items-center gap-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm px-4 py-4 rounded-xl font-medium transition-colors text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Kartu Persediaan
-            </a>
-        </div>
-    </div>
 
 </div>
 
