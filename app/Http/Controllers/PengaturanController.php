@@ -24,6 +24,7 @@ class PengaturanController extends Controller
             'alamat_instansi' => 'nullable|string|max:500',
             'kota'            => 'nullable|string|max:100',
             'logo'            => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
+            'hapus_logo'      => 'nullable|boolean',
             'ttd1_jabatan'    => 'nullable|string|max:255',
             'ttd1_nama'       => 'nullable|string|max:255',
             'ttd1_nip'        => 'nullable|string|max:50',
@@ -43,10 +44,17 @@ class PengaturanController extends Controller
         );
 
         if ($request->hasFile('logo')) {
+            // upload logo baru -> hapus logo lama, simpan yang baru
             if ($pengaturan->logo_path && Storage::disk('public')->exists($pengaturan->logo_path)) {
                 Storage::disk('public')->delete($pengaturan->logo_path);
             }
             $data['logo_path'] = $request->file('logo')->store('logo', 'public');
+        } elseif ($request->boolean('hapus_logo')) {
+            // checkbox "hapus logo" dicentang, tidak upload baru -> balik ke default (null)
+            if ($pengaturan->logo_path && Storage::disk('public')->exists($pengaturan->logo_path)) {
+                Storage::disk('public')->delete($pengaturan->logo_path);
+            }
+            $data['logo_path'] = null;
         }
 
         $pengaturan->update($data);

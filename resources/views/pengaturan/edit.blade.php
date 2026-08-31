@@ -92,11 +92,19 @@
                             </svg>
                         @endif
                     </div>
-                    <div class="flex-1 min-w-0">
+                                      <div class="flex-1 min-w-0">
                         <input type="file" name="logo" accept="image/png,image/jpeg,image/svg+xml"
                                class="w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 file:text-sm file:font-medium file:cursor-pointer hover:file:bg-blue-100 file:transition-colors">
                         <p class="text-xs text-gray-400 mt-1.5">PNG/JPG/SVG, maks 2MB. Kosongkan jika tidak ingin ganti.</p>
                         @error('logo') <p class="text-xs text-red-500 mt-1.5">{{ $message }}</p> @enderror
+
+                        @if($pengaturan->logo_url)
+                            <label class="flex items-center gap-2 mt-3 text-sm text-gray-600 cursor-pointer">
+                                <input type="checkbox" name="hapus_logo" value="1"
+                                       class="rounded border-gray-300 text-red-600 focus:ring-red-400">
+                                Hapus logo saat ini (kembali ke default)
+                            </label>
+                        @endif
                     </div>
                 </div>
             </div>

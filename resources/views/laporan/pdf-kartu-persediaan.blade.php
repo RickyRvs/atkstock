@@ -3,9 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <style>
-    body { font-family: sans-serif; font-size: 11px; color: #222; }
-    h2 { font-size: 14px; margin: 0; }
-    p { margin: 2px 0; font-size: 11px; color: #555; }
+    body {
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 11px;
+        color: #222;
+        padding: 0 20px;
+    }
+
+    /* ===== Kop Surat ===== */
+    .kop-surat {
+        display: table;
+        width: 100%;
+        border-bottom: 3px solid #222;
+        padding-bottom: 10px;
+        margin-bottom: 4px;
+    }
+    .kop-logo {
+        display: table-cell;
+        width: 70px;
+        vertical-align: middle;
+    }
+    .kop-logo img {
+        width: 62px;
+        height: 62px;
+        object-fit: contain;
+    }
+    .kop-text {
+        display: table-cell;
+        vertical-align: middle;
+        padding-left: 12px;
+    }
+    .kop-text h1 {
+        font-size: 17px;
+        margin: 0;
+        text-transform: uppercase;
+        font-weight: bold;
+        letter-spacing: 0.3px;
+    }
+    .kop-text p {
+        font-size: 9.5px;
+        margin: 2px 0 0;
+        color: #444;
+    }
+
+    /* ===== Judul Dokumen ===== */
+    .doc-title { text-align: left; margin: 12px 0 4px; }
+    .doc-title h2 { font-size: 13px; margin: 0; }
+    .doc-title p { font-size: 11px; margin: 2px 0; color: #555; }
+
     table.data { width: 100%; border-collapse: collapse; margin-top: 16px; }
     table.data th { background: #007BB8; color: white; padding: 6px 8px; text-align: left; font-size: 10px; }
     table.data td { padding: 5px 8px; border-bottom: 1px solid #e5e7eb; }
@@ -14,7 +59,6 @@
     .text-center { text-align: center; }
     .red { color: #dc2626; font-weight: bold; }
     .green { color: #16a34a; font-weight: bold; }
-    .header { margin-bottom: 12px; border-bottom: 2px solid #007BB8; padding-bottom: 8px; }
     .info-barang { background: #eff6ff; padding: 8px 10px; border-radius: 4px; margin-top: 10px; font-size: 11px; }
     .footer { margin-top: 24px; font-size: 10px; color: #888; text-align: right; }
     .page-break { page-break-after: always; }
@@ -36,9 +80,24 @@
             ->get();
     @endphp
 
-    <div class="header">
+    {{-- ===== Kop Surat ===== --}}
+    <div class="kop-surat">
+        <div class="kop-logo">
+            @if(pengaturan()->logoAbsolutePath())
+                <img src="{{ pengaturan()->logoAbsolutePath() }}" alt="Logo">
+            @endif
+        </div>
+        <div class="kop-text">
+            <h1>{{ pengaturan()->nama_instansi }}</h1>
+            @if(pengaturan()->alamat_instansi)
+                <p>{{ pengaturan()->alamat_instansi }}</p>
+            @endif
+        </div>
+    </div>
+
+    {{-- ===== Judul Dokumen ===== --}}
+    <div class="doc-title">
         <h2>Kartu Kendali Persediaan Barang Pakai Habis (ATK/ARK)</h2>
-        <p>{{ pengaturan()->nama_instansi }}</p>
         <p>Periode: {{ \Carbon\Carbon::create()->month((int) $bulan)->isoFormat('MMMM') }} {{ $tahun }}</p>
     </div>
 
