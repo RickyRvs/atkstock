@@ -72,13 +72,13 @@ class DashboardController extends Controller
             $trenKeluar[] = (int) Transaksi::keluar()->byBulanTahun($b, $t)->sum('jumlah');
         }
 
-        // ===== Distribusi barang per kategori =====
         $distribusiKategori = Kategori::withCount(['barangs' => function ($q) {
                 $q->where('is_active', true);
             }])
-            ->having('barangs_count', '>', 0)
-            ->orderByDesc('barangs_count')
-            ->get();
+            ->get()
+            ->filter(fn ($k) => $k->barangs_count > 0)
+            ->sortByDesc('barangs_count')
+            ->values();
 
         return view('dashboard', compact(
             'totalBarang',
